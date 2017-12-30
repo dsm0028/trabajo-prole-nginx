@@ -8,17 +8,104 @@ public interface practicaNginxConstants {
 
   /** End of File. */
   int EOF = 0;
+  /** RegularExpression Id. */
+  int ID = 4;
+  /** RegularExpression Id. */
+  int VALOR = 5;
+  /** RegularExpression Id. */
+  int INICIO_CTXT = 6;
+  /** RegularExpression Id. */
+  int FINAL_CTXT = 7;
+  /** RegularExpression Id. */
+  int CONTEXTOS_SIMPLES = 8;
+  /** RegularExpression Id. */
+  int CONTEXTOS_MULTI = 9;
+  /** RegularExpression Id. */
+  int INICIO_COM = 10;
+  /** RegularExpression Id. */
+  int FIN_COMENTARIO_LINEA = 11;
+  /** RegularExpression Id. */
+  int COSAS_COMENTADAS_LINEA = 12;
+  /** RegularExpression Id. */
+  int SIMPLE = 13;
+  /** RegularExpression Id. */
+  int COMPLEJO = 14;
+  /** RegularExpression Id. */
+  int CLAVE = 15;
+  /** RegularExpression Id. */
+  int LITERALMENTE_CUALQUIER_COSA = 17;
+  /** RegularExpression Id. */
+  int VALOR_DE_CLAVE = 18;
+  /** RegularExpression Id. */
+  int EMPEZAMOS = 19;
+  /** RegularExpression Id. */
+  int EMPEZAMOS_OTRA_VEZ = 20;
+  /** RegularExpression Id. */
+  int CONTEXTO_ANIDADO = 21;
+  /** RegularExpression Id. */
+  int SALIDA = 22;
+  /** RegularExpression Id. */
+  int CLAVICORDIO = 23;
+  /** RegularExpression Id. */
+  int SUBCLAVE_L2 = 24;
+  /** RegularExpression Id. */
+  int DA_BASTANTE_IGUAL_2 = 25;
+  /** RegularExpression Id. */
+  int SALIDA2 = 26;
+  /** RegularExpression Id. */
+  int FIN_VALOR = 27;
 
   /** Lexical state. */
-  int DEFAULT = 0;
+  int VALOR_DONDE_SEA = 0;
+  /** Lexical state. */
+  int CUERPO_SUBCONTEXTO = 1;
+  /** Lexical state. */
+  int SUBCONTEXTO = 2;
+  /** Lexical state. */
+  int NOMBRE_CON = 3;
+  /** Lexical state. */
+  int ID_EN_CTXT = 4;
+  /** Lexical state. */
+  int ID_EN_MAIN = 5;
+  /** Lexical state. */
+  int ARGS_CONTEXTO = 6;
+  /** Lexical state. */
+  int CUERPO_CONTEXTO = 7;
+  /** Lexical state. */
+  int COM = 8;
+  /** Lexical state. */
+  int DEFAULT = 9;
 
   /** Literal token values. */
   String[] tokenImage = {
     "<EOF>",
-    "\" \"",
     "\"\\r\"",
     "\"\\t\"",
+    "\" \"",
+    "<ID>",
+    "<VALOR>",
+    "\"{\"",
+    "\"}\"",
+    "<CONTEXTOS_SIMPLES>",
+    "<CONTEXTOS_MULTI>",
+    "\"#\"",
     "\"\\n\"",
+    "<COSAS_COMENTADAS_LINEA>",
+    "<SIMPLE>",
+    "<COMPLEJO>",
+    "<CLAVE>",
+    "\"\\n\"",
+    "<LITERALMENTE_CUALQUIER_COSA>",
+    "<VALOR_DE_CLAVE>",
+    "<EMPEZAMOS>",
+    "<EMPEZAMOS_OTRA_VEZ>",
+    "<CONTEXTO_ANIDADO>",
+    "<SALIDA>",
+    "<CLAVICORDIO>",
+    "<SUBCLAVE_L2>",
+    "<DA_BASTANTE_IGUAL_2>",
+    "<SALIDA2>",
+    "\";\"",
   };
 
 }

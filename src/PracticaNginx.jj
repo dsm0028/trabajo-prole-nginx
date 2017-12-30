@@ -1,5 +1,244 @@
 /**
  * JavaCC template file created by SF JavaCC plugin 1.5.28+ wizard for JavaCC 1.5.0+
- */options{  static = false;}PARSER_BEGIN(practicaNginx)
-public class practicaNginx{
-  public static void main(String args []) throws ParseException  {    //aquí va la entrada   }}PARSER_END(practicaNginx)SKIP :{  " "| "\r"| "\t"| "\n"}
+ * TAREAS QUE HACE ESTO:
+ *  Listar los nombres de todos los contextos en el archivo de configuración.
+ *  Contar el número de líneas de comentario.
+ *  Identificar el contexto con más propiedades. 
+ */
+options
+{
+  static = false;
+  DEBUG_TOKEN_MANAGER = true;
+}
+
+PARSER_BEGIN(practicaNginx)
+import java.util.Stack;
+
+public class practicaNginx
+{
+  public static void main(String args []) throws ParseException, java.io.FileNotFoundException
+  {
+    practicaNginxTokenManager tkmngr = null;
+    //Entrada por fichero. Si no recibe nada salimos.
+    if (args.length < 1)
+    {
+      System.out.println("Pero p\u00e1sale un fichero, CRACK");
+      System.exit(0);
+    }
+    else
+    {
+      tkmngr = new practicaNginxTokenManager(
+      new SimpleCharStream(new java.io.FileInputStream(args [0]), 0, 0)
+      );
+    }
+    Token tk;
+    try
+    {
+      while ((tk = tkmngr.getNextToken()).kind != EOF);
+      //Impresión de estadísticas.
+      System.out.println("Lineas de comentario: " + tkmngr.lineasComentario);
+      System.out.println("El contexto con m\u00e1s propiedades (" + tkmngr.maxNumeroPropiedades + ") es: " + tkmngr.contextoMasPropiedades);
+    }
+    catch (TokenMgrError x)
+    {
+      System.out.println("Exiting.");
+      throw x;
+    }
+  }
+}
+
+PARSER_END(practicaNginx)
+
+TOKEN_MGR_DECLS :
+{
+  int lineasComentario = 0;
+  int numeroPropiedades = 0;
+  int maxNumeroPropiedades = 0;
+  boolean esDefault = true;
+  String contextoMasPropiedades = new String("Ninguno.");
+  String contextoActual = new String();
+  Stack pilaEstados = new Stack();
+}
+
+<* >
+SKIP :
+{
+  "\r"
+| "\t"
+| " "
+}
+
+TOKEN :
+{
+  < #ID : ([ "a"-"z", "A"-"Z", "_", "/" ])+ >
+| 	< #VALOR :
+    (
+      ~[ "\n", "\t", " ", ";", "{", "}", "#" ] (~[ "\n", "\t", ";", "{", "}", "#" ])*
+    )
+  |
+    (
+      "\'" (~[ "\'" ])+ "\'"
+    ) >
+| 	< #INICIO_CTXT : ("{") >
+| 	< #FINAL_CTXT : ("}") >
+| 	< #CONTEXTOS_SIMPLES :
+    ("events")
+  | ("http")
+  | ("server")
+  | ("mail") >
+| 	< #CONTEXTOS_MULTI :
+    ("location")
+  | ("upstream")
+  | ("if")
+  | ("limit_except") >
+}
+
+<* >
+MORE :
+{
+  < INICIO_COM : "#" >
+  {
+    pilaEstados.push(curLexState);
+  }
+  : COM
+}
+
+< COM >
+TOKEN :
+{
+  < FIN_COMENTARIO_LINEA : "\n" >
+  {
+    lineasComentario++;
+    SwitchTo((int) pilaEstados.pop());
+  }
+| < COSAS_COMENTADAS_LINEA : (~[ "\n" ])+ >
+}
+
+< DEFAULT >
+TOKEN :
+{
+  < SIMPLE : < CONTEXTOS_SIMPLES > >
+  {
+    System.out.println("Detectado contexto: " + image.toString());
+    contextoActual = image.toString();
+    esDefault = false;
+  }
+  : NOMBRE_CON
+| < COMPLEJO : < CONTEXTOS_MULTI > >
+  {
+    System.out.print("Detectado contexto: " + image.toString());
+    contextoActual = image.toString();
+    esDefault = false;
+  }
+  : ARGS_CONTEXTO
+| < CLAVE : < ID > >
+  {
+  }
+  : ID_EN_MAIN
+}
+
+< DEFAULT, CUERPO_CONTEXTO >
+SKIP :
+{
+  "\n"
+}
+
+< ARGS_CONTEXTO >
+TOKEN :
+{
+  < LITERALMENTE_CUALQUIER_COSA : ~[ "{" ] >
+  {
+    System.out.println(" con variables: " + image.toString());
+  }
+  : CUERPO_CONTEXTO
+}
+
+< ID_EN_MAIN, ID_EN_CTXT >
+TOKEN :
+{
+  < VALOR_DE_CLAVE : < VALOR > >
+  {
+    pilaEstados.push(curLexState);
+  }
+  : VALOR_DONDE_SEA
+}
+
+< NOMBRE_CON >
+TOKEN :
+{
+  < EMPEZAMOS : < INICIO_CTXT > >
+  {
+    numeroPropiedades = 0;
+  }
+  : CUERPO_CONTEXTO
+}
+
+< SUBCONTEXTO >
+TOKEN :
+{
+  < EMPEZAMOS_OTRA_VEZ : < INICIO_CTXT > >
+  {
+  }
+  : CUERPO_SUBCONTEXTO
+}
+
+< CUERPO_CONTEXTO >
+TOKEN :
+{
+  < CONTEXTO_ANIDADO : < CONTEXTOS_SIMPLES > >
+  {
+    System.out.println("\tDetectado subcontexto: " + image.toString());
+  }
+  : SUBCONTEXTO
+| < SALIDA : < FINAL_CTXT > >
+  {
+    if (numeroPropiedades > maxNumeroPropiedades)
+    {
+      maxNumeroPropiedades = numeroPropiedades;
+      contextoMasPropiedades = new String(contextoActual);
+    }
+    contextoActual = new String();
+    esDefault = true;
+  }
+  : DEFAULT
+| < CLAVICORDIO : < ID > >
+  {
+    pilaEstados.push(curLexState);
+    numeroPropiedades++;
+  }
+  : ID_EN_CTXT
+}
+
+< CUERPO_SUBCONTEXTO >
+TOKEN :
+{
+  < SUBCLAVE_L2 : < ID > >
+  {
+    pilaEstados.push(curLexState);
+  }
+| < DA_BASTANTE_IGUAL_2 : < VALOR > >
+  {
+    pilaEstados.push(curLexState);
+  }
+  : VALOR_DONDE_SEA
+| < SALIDA2 : < FINAL_CTXT > >
+  {
+  }
+  : CUERPO_CONTEXTO
+}
+
+< VALOR_DONDE_SEA >
+TOKEN :
+{
+  < FIN_VALOR : ";" >
+  {
+    if (!esDefault)
+    {
+      SwitchTo((int) pilaEstados.pop());
+    }
+    else
+    {
+      SwitchTo(DEFAULT);
+    }
+  }
+}
