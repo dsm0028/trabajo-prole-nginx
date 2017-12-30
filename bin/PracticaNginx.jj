@@ -1,0 +1,5 @@
+/**
+ * JavaCC template file created by SF JavaCC plugin 1.5.28+ wizard for JavaCC 1.5.0+
+ */options{  static = false;}PARSER_BEGIN(practicaNginx)
+public class practicaNginx{
+  public static void main(String args []) throws ParseException  {    //aquí va la entrada   }}PARSER_END(practicaNginx)SKIP :{  " "| "\r"| "\t"| "\n"}
