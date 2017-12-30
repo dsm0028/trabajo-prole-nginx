@@ -1,14 +1,15 @@
 /**
  * JavaCC template file created by SF JavaCC plugin 1.5.28+ wizard for JavaCC 1.5.0+
  * TAREAS QUE HACE ESTO:
- *  Listar los nombres de todos los contextos en el archivo de configuración.
+ *  Listar los nombres de todos los contextos, subcontextos (y argumentos si es que hay)
+ 	en el archivo de configuración.
  *  Contar el número de líneas de comentario.
- *  Identificar el contexto con más propiedades. 
+ *  Identificar el contexto de primer nivel con más propiedades. 
  */
 options
 {
   static = false;
-  DEBUG_TOKEN_MANAGER = true;
+  DEBUG_TOKEN_MANAGER = false;
 }
 
 PARSER_BEGIN(practicaNginx)
@@ -37,7 +38,7 @@ public class practicaNginx
       while ((tk = tkmngr.getNextToken()).kind != EOF);
       //Impresión de estadísticas.
       System.out.println("Lineas de comentario: " + tkmngr.lineasComentario);
-      System.out.println("El contexto con m\u00e1s propiedades (" + tkmngr.maxNumeroPropiedades + ") es: " + tkmngr.contextoMasPropiedades);
+      System.out.println("El contexto de primer nivel con m\u00e1s propiedades (" + tkmngr.maxNumeroPropiedades + ") es: " + tkmngr.contextoMasPropiedades);
     }
     catch (TokenMgrError x)
     {
@@ -54,7 +55,7 @@ TOKEN_MGR_DECLS :
   int lineasComentario = 0;
   int numeroPropiedades = 0;
   int maxNumeroPropiedades = 0;
-  boolean esDefault = true;
+  boolean listaSrv = false;
   String contextoMasPropiedades = new String("Ninguno.");
   String contextoActual = new String();
   Stack pilaEstados = new Stack();
@@ -73,7 +74,7 @@ TOKEN :
   < #ID : ([ "a"-"z", "A"-"Z", "_", "/" ])+ >
 | 	< #VALOR :
     (
-      ~[ "\n", "\t", " ", ";", "{", "}", "#" ] (~[ "\n", "\t", ";", "{", "}", "#" ])*
+      ~[ "\n", "\t", " ", ";", "{", "}", "#" ] (~[ ";", "{", "}", "#" ])*
     )
   |
     (
@@ -119,25 +120,37 @@ TOKEN :
 {
   < SIMPLE : < CONTEXTOS_SIMPLES > >
   {
-    System.out.println("Detectado contexto: " + image.toString());
+    pilaEstados.push(curLexState);
     contextoActual = image.toString();
-    esDefault = false;
+    if (listaSrv)
+    {
+      SwitchTo(ID_EN_MAIN);
+    }
+    else
+    {
+      System.out.println("Detectado contexto: " + image.toString());
+      SwitchTo(NOMBRE_CON);
+    }
   }
-  : NOMBRE_CON
 | < COMPLEJO : < CONTEXTOS_MULTI > >
   {
+    if (image.toString().equals("upstream"))
+    {
+      listaSrv = true;
+    }
     System.out.print("Detectado contexto: " + image.toString());
+    pilaEstados.push(curLexState);
     contextoActual = image.toString();
-    esDefault = false;
   }
   : ARGS_CONTEXTO
 | < CLAVE : < ID > >
   {
+    pilaEstados.push(curLexState);
   }
   : ID_EN_MAIN
 }
 
-< DEFAULT, CUERPO_CONTEXTO >
+< DEFAULT, CUERPO_CONTEXTO, CUERPO_SUBCONTEXTO >
 SKIP :
 {
   "\n"
@@ -146,19 +159,28 @@ SKIP :
 < ARGS_CONTEXTO >
 TOKEN :
 {
-  < LITERALMENTE_CUALQUIER_COSA : ~[ "{" ] >
+  < LITERALMENTE_CUALQUIER_COSA : (~[ "{" ])+ >
   {
     System.out.println(" con variables: " + image.toString());
   }
-  : CUERPO_CONTEXTO
+  : SUBCONTEXTO
 }
 
-< ID_EN_MAIN, ID_EN_CTXT >
+< ARGS_SUBCONTEXTO >
+TOKEN :
+{
+  < LITERALMENTE_CUALQUIER_COSA_2 : (~[ "{" ])+ >
+  {
+    System.out.println(" con variables: " + image.toString());
+  }
+  : SUBCONTEXTO
+}
+
+< ID_EN_MAIN, ID_EN_CTXT, ID_EN_SUBCTXT >
 TOKEN :
 {
   < VALOR_DE_CLAVE : < VALOR > >
   {
-    pilaEstados.push(curLexState);
   }
   : VALOR_DONDE_SEA
 }
@@ -187,9 +209,27 @@ TOKEN :
 {
   < CONTEXTO_ANIDADO : < CONTEXTOS_SIMPLES > >
   {
-    System.out.println("\tDetectado subcontexto: " + image.toString());
+    pilaEstados.push(curLexState);
+    if (listaSrv && image.toString().equals("server"))
+    {
+      SwitchTo(ID_EN_CTXT);
+    }
+    else
+    {
+      System.out.println("\tDetectado subcontexto: " + image.toString());
+      SwitchTo(SUBCONTEXTO);
+    }
   }
-  : SUBCONTEXTO
+| < CONTEXTO_ANIDADO_ARGS : < CONTEXTOS_MULTI > >
+  {
+    if (image.toString().equals("upstream"))
+    {
+      listaSrv = true;
+    }
+    System.out.print("\tDetectado subcontexto: " + image.toString());
+    pilaEstados.push(curLexState);
+  }
+  : ARGS_SUBCONTEXTO
 | < SALIDA : < FINAL_CTXT > >
   {
     if (numeroPropiedades > maxNumeroPropiedades)
@@ -198,9 +238,8 @@ TOKEN :
       contextoMasPropiedades = new String(contextoActual);
     }
     contextoActual = new String();
-    esDefault = true;
+    SwitchTo((int) pilaEstados.pop());
   }
-  : DEFAULT
 | < CLAVICORDIO : < ID > >
   {
     pilaEstados.push(curLexState);
@@ -212,19 +251,39 @@ TOKEN :
 < CUERPO_SUBCONTEXTO >
 TOKEN :
 {
-  < SUBCLAVE_L2 : < ID > >
+  < MAS_ANIDACION_SIMPLE : < CONTEXTOS_SIMPLES > >
+  {
+    pilaEstados.push(curLexState);
+    if (listaSrv && image.toString().equals("server"))
+    {
+      SwitchTo(ID_EN_SUBCTXT);
+    }
+    else
+    {
+      System.out.println("\tDetectado subcontexto: " + image.toString());
+      SwitchTo(SUBCONTEXTO);
+    }
+  }
+| < MAS_ANIDACION_COMPLEJA : < CONTEXTOS_MULTI > >
+  {
+    if (image.toString().equals("upstream"))
+    {
+      listaSrv = true;
+    }
+    System.out.print("\tDetectado subcontexto: " + image.toString());
+    pilaEstados.push(curLexState);
+  }
+  : ARGS_SUBCONTEXTO
+| < SUBCLAVE_L2 : < ID > >
   {
     pilaEstados.push(curLexState);
   }
-| < DA_BASTANTE_IGUAL_2 : < VALOR > >
-  {
-    pilaEstados.push(curLexState);
-  }
-  : VALOR_DONDE_SEA
+  : ID_EN_SUBCTXT
 | < SALIDA2 : < FINAL_CTXT > >
   {
+    listaSrv = false;
+    SwitchTo((int) pilaEstados.pop());
   }
-  : CUERPO_CONTEXTO
 }
 
 < VALOR_DONDE_SEA >
@@ -232,13 +291,6 @@ TOKEN :
 {
   < FIN_VALOR : ";" >
   {
-    if (!esDefault)
-    {
-      SwitchTo((int) pilaEstados.pop());
-    }
-    else
-    {
-      SwitchTo(DEFAULT);
-    }
+    SwitchTo((int) pilaEstados.pop());
   }
 }

@@ -35,46 +35,56 @@ public interface practicaNginxConstants {
   /** RegularExpression Id. */
   int LITERALMENTE_CUALQUIER_COSA = 17;
   /** RegularExpression Id. */
-  int VALOR_DE_CLAVE = 18;
+  int LITERALMENTE_CUALQUIER_COSA_2 = 18;
   /** RegularExpression Id. */
-  int EMPEZAMOS = 19;
+  int VALOR_DE_CLAVE = 19;
   /** RegularExpression Id. */
-  int EMPEZAMOS_OTRA_VEZ = 20;
+  int EMPEZAMOS = 20;
   /** RegularExpression Id. */
-  int CONTEXTO_ANIDADO = 21;
+  int EMPEZAMOS_OTRA_VEZ = 21;
   /** RegularExpression Id. */
-  int SALIDA = 22;
+  int CONTEXTO_ANIDADO = 22;
   /** RegularExpression Id. */
-  int CLAVICORDIO = 23;
+  int CONTEXTO_ANIDADO_ARGS = 23;
   /** RegularExpression Id. */
-  int SUBCLAVE_L2 = 24;
+  int SALIDA = 24;
   /** RegularExpression Id. */
-  int DA_BASTANTE_IGUAL_2 = 25;
+  int CLAVICORDIO = 25;
   /** RegularExpression Id. */
-  int SALIDA2 = 26;
+  int MAS_ANIDACION_SIMPLE = 26;
   /** RegularExpression Id. */
-  int FIN_VALOR = 27;
+  int MAS_ANIDACION_COMPLEJA = 27;
+  /** RegularExpression Id. */
+  int SUBCLAVE_L2 = 28;
+  /** RegularExpression Id. */
+  int SALIDA2 = 29;
+  /** RegularExpression Id. */
+  int FIN_VALOR = 30;
 
   /** Lexical state. */
   int VALOR_DONDE_SEA = 0;
   /** Lexical state. */
-  int CUERPO_SUBCONTEXTO = 1;
+  int SUBCONTEXTO = 1;
   /** Lexical state. */
-  int SUBCONTEXTO = 2;
+  int NOMBRE_CON = 2;
   /** Lexical state. */
-  int NOMBRE_CON = 3;
+  int ID_EN_SUBCTXT = 3;
   /** Lexical state. */
   int ID_EN_CTXT = 4;
   /** Lexical state. */
   int ID_EN_MAIN = 5;
   /** Lexical state. */
-  int ARGS_CONTEXTO = 6;
+  int ARGS_SUBCONTEXTO = 6;
   /** Lexical state. */
-  int CUERPO_CONTEXTO = 7;
+  int ARGS_CONTEXTO = 7;
   /** Lexical state. */
-  int COM = 8;
+  int CUERPO_SUBCONTEXTO = 8;
   /** Lexical state. */
-  int DEFAULT = 9;
+  int CUERPO_CONTEXTO = 9;
+  /** Lexical state. */
+  int COM = 10;
+  /** Lexical state. */
+  int DEFAULT = 11;
 
   /** Literal token values. */
   String[] tokenImage = {
@@ -96,14 +106,17 @@ public interface practicaNginxConstants {
     "<CLAVE>",
     "\"\\n\"",
     "<LITERALMENTE_CUALQUIER_COSA>",
+    "<LITERALMENTE_CUALQUIER_COSA_2>",
     "<VALOR_DE_CLAVE>",
     "<EMPEZAMOS>",
     "<EMPEZAMOS_OTRA_VEZ>",
     "<CONTEXTO_ANIDADO>",
+    "<CONTEXTO_ANIDADO_ARGS>",
     "<SALIDA>",
     "<CLAVICORDIO>",
+    "<MAS_ANIDACION_SIMPLE>",
+    "<MAS_ANIDACION_COMPLEJA>",
     "<SUBCLAVE_L2>",
-    "<DA_BASTANTE_IGUAL_2>",
     "<SALIDA2>",
     "\";\"",
   };

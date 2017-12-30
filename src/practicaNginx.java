@@ -23,7 +23,7 @@ public class practicaNginx implements practicaNginxConstants {
       while ((tk = tkmngr.getNextToken()).kind != EOF);
       //Impresión de estadísticas.
       System.out.println("Lineas de comentario: " + tkmngr.lineasComentario);
-      System.out.println("El contexto con m\u00e1s propiedades (" + tkmngr.maxNumeroPropiedades + ") es: " + tkmngr.contextoMasPropiedades);
+      System.out.println("El contexto de primer nivel con m\u00e1s propiedades (" + tkmngr.maxNumeroPropiedades + ") es: " + tkmngr.contextoMasPropiedades);
     }
     catch (TokenMgrError x)
     {
@@ -164,7 +164,7 @@ public class practicaNginx implements practicaNginxConstants {
   /** Generate ParseException. */
   public ParseException generateParseException() {
     jj_expentries.clear();
-    boolean[] la1tokens = new boolean[28];
+    boolean[] la1tokens = new boolean[31];
     if (jj_kind >= 0) {
       la1tokens[jj_kind] = true;
       jj_kind = -1;
@@ -178,7 +178,7 @@ public class practicaNginx implements practicaNginxConstants {
         }
       }
     }
-    for (int i = 0; i < 28; i++) {
+    for (int i = 0; i < 31; i++) {
       if (la1tokens[i]) {
         jj_expentry = new int[1];
         jj_expentry[0] = i;
