@@ -35,9 +35,16 @@ public class practicaNginx
     Token tk;
     try
     {
+      System.out.println("Diagrama de contextos y profundidad:");
+      System.out.println("------------------------------------");
       while ((tk = tkmngr.getNextToken()).kind != EOF);
       //Impresión de estadísticas.
+      System.out.println("------------------------------------");
       System.out.println("Lineas de comentario: " + tkmngr.lineasComentario);
+      if(tkmngr.propsMain > tkmngr.maxNumeroPropiedades || tkmngr.contextoMasPropiedades.isEmpty()) {
+		tkmngr.maxNumeroPropiedades = tkmngr.propsMain;
+		tkmngr.contextoMasPropiedades = new String("main");
+      }
       System.out.println("El contexto de primer nivel con m\u00e1s propiedades (" + tkmngr.maxNumeroPropiedades + ") es: " + tkmngr.contextoMasPropiedades);
     }
     catch (TokenMgrError x)
@@ -55,10 +62,18 @@ TOKEN_MGR_DECLS :
   int lineasComentario = 0;
   int numeroPropiedades = 0;
   int maxNumeroPropiedades = 0;
+  int propsMain = 0;
+  int depthLevel = 0;
   boolean listaSrv = false;
   String contextoMasPropiedades = new String("Ninguno.");
   String contextoActual = new String();
   Stack pilaEstados = new Stack();
+
+  void tabular() {
+	for(int i = 0; i < depthLevel; i++) {
+		System.out.print("\t");
+	}
+  }
 }
 
 <* >
@@ -128,6 +143,7 @@ TOKEN :
     }
     else
     {
+      tabular();
       System.out.println("Detectado contexto: " + image.toString());
       SwitchTo(NOMBRE_CON);
     }
@@ -138,6 +154,7 @@ TOKEN :
     {
       listaSrv = true;
     }
+    tabular();
     System.out.print("Detectado contexto: " + image.toString());
     pilaEstados.push(curLexState);
     contextoActual = image.toString();
@@ -145,6 +162,7 @@ TOKEN :
   : ARGS_CONTEXTO
 | < CLAVE : < ID > >
   {
+    propsMain++;
     pilaEstados.push(curLexState);
   }
   : ID_EN_MAIN
@@ -191,6 +209,7 @@ TOKEN :
   < EMPEZAMOS : < INICIO_CTXT > >
   {
     numeroPropiedades = 0;
+    depthLevel++;
   }
   : CUERPO_CONTEXTO
 }
@@ -200,6 +219,7 @@ TOKEN :
 {
   < EMPEZAMOS_OTRA_VEZ : < INICIO_CTXT > >
   {
+    depthLevel++;
   }
   : CUERPO_SUBCONTEXTO
 }
@@ -216,7 +236,8 @@ TOKEN :
     }
     else
     {
-      System.out.println("\tDetectado subcontexto: " + image.toString());
+      tabular();
+      System.out.println("Detectado subcontexto: " + image.toString());
       SwitchTo(SUBCONTEXTO);
     }
   }
@@ -226,7 +247,8 @@ TOKEN :
     {
       listaSrv = true;
     }
-    System.out.print("\tDetectado subcontexto: " + image.toString());
+    tabular();
+    System.out.print("Detectado subcontexto: " + image.toString());
     pilaEstados.push(curLexState);
   }
   : ARGS_SUBCONTEXTO
@@ -238,6 +260,7 @@ TOKEN :
       contextoMasPropiedades = new String(contextoActual);
     }
     contextoActual = new String();
+    depthLevel--;
     SwitchTo((int) pilaEstados.pop());
   }
 | < CLAVICORDIO : < ID > >
@@ -260,7 +283,8 @@ TOKEN :
     }
     else
     {
-      System.out.println("\tDetectado subcontexto: " + image.toString());
+      tabular();
+      System.out.println("Detectado subcontexto: " + image.toString());
       SwitchTo(SUBCONTEXTO);
     }
   }
@@ -270,7 +294,8 @@ TOKEN :
     {
       listaSrv = true;
     }
-    System.out.print("\tDetectado subcontexto: " + image.toString());
+    tabular();
+    System.out.print("Detectado subcontexto: " + image.toString());
     pilaEstados.push(curLexState);
   }
   : ARGS_SUBCONTEXTO
@@ -282,6 +307,7 @@ TOKEN :
 | < SALIDA2 : < FINAL_CTXT > >
   {
     listaSrv = false;
+    depthLevel--;
     SwitchTo((int) pilaEstados.pop());
   }
 }

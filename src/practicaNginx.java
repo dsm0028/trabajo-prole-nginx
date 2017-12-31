@@ -20,9 +20,16 @@ public class practicaNginx implements practicaNginxConstants {
     Token tk;
     try
     {
+      System.out.println("Diagrama de contextos y profundidad:");
+      System.out.println("------------------------------------");
       while ((tk = tkmngr.getNextToken()).kind != EOF);
       //Impresión de estadísticas.
+      System.out.println("------------------------------------");
       System.out.println("Lineas de comentario: " + tkmngr.lineasComentario);
+      if(tkmngr.propsMain > tkmngr.maxNumeroPropiedades || tkmngr.contextoMasPropiedades.isEmpty()) {
+                tkmngr.maxNumeroPropiedades = tkmngr.propsMain;
+                tkmngr.contextoMasPropiedades = new String("main");
+      }
       System.out.println("El contexto de primer nivel con m\u00e1s propiedades (" + tkmngr.maxNumeroPropiedades + ") es: " + tkmngr.contextoMasPropiedades);
     }
     catch (TokenMgrError x)

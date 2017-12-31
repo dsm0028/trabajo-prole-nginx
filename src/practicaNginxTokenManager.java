@@ -7,10 +7,18 @@ public class practicaNginxTokenManager implements practicaNginxConstants
   int lineasComentario = 0;
   int numeroPropiedades = 0;
   int maxNumeroPropiedades = 0;
+  int propsMain = 0;
+  int depthLevel = 0;
   boolean listaSrv = false;
   String contextoMasPropiedades = new String("Ninguno.");
   String contextoActual = new String();
   Stack pilaEstados = new Stack();
+
+  void tabular() {
+        for(int i = 0; i < depthLevel; i++) {
+                System.out.print("\u005ct");
+        }
+  }
 
   /** Debug output. */
   public  java.io.PrintStream debugStream = System.out;
@@ -2251,6 +2259,7 @@ void TokenLexicalActions(Token matchedToken)
     }
     else
     {
+      tabular();
       System.out.println("Detectado contexto: " + image.toString());
       SwitchTo(NOMBRE_CON);
     }
@@ -2261,12 +2270,14 @@ void TokenLexicalActions(Token matchedToken)
     {
       listaSrv = true;
     }
+    tabular();
     System.out.print("Detectado contexto: " + image.toString());
     pilaEstados.push(curLexState);
     contextoActual = image.toString();
          break;
       case 15 :
         image.append(input_stream.GetSuffix(jjimageLen + (lengthOfMatch = jjmatchedPos + 1)));
+    propsMain++;
     pilaEstados.push(curLexState);
          break;
       case 17 :
@@ -2280,6 +2291,11 @@ void TokenLexicalActions(Token matchedToken)
       case 20 :
         image.append(input_stream.GetSuffix(jjimageLen + (lengthOfMatch = jjmatchedPos + 1)));
     numeroPropiedades = 0;
+    depthLevel++;
+         break;
+      case 21 :
+        image.append(input_stream.GetSuffix(jjimageLen + (lengthOfMatch = jjmatchedPos + 1)));
+    depthLevel++;
          break;
       case 22 :
         image.append(input_stream.GetSuffix(jjimageLen + (lengthOfMatch = jjmatchedPos + 1)));
@@ -2290,7 +2306,8 @@ void TokenLexicalActions(Token matchedToken)
     }
     else
     {
-      System.out.println("\u005ctDetectado subcontexto: " + image.toString());
+      tabular();
+      System.out.println("Detectado subcontexto: " + image.toString());
       SwitchTo(SUBCONTEXTO);
     }
          break;
@@ -2300,7 +2317,8 @@ void TokenLexicalActions(Token matchedToken)
     {
       listaSrv = true;
     }
-    System.out.print("\u005ctDetectado subcontexto: " + image.toString());
+    tabular();
+    System.out.print("Detectado subcontexto: " + image.toString());
     pilaEstados.push(curLexState);
          break;
       case 24 :
@@ -2311,6 +2329,7 @@ void TokenLexicalActions(Token matchedToken)
       contextoMasPropiedades = new String(contextoActual);
     }
     contextoActual = new String();
+    depthLevel--;
     SwitchTo((int) pilaEstados.pop());
          break;
       case 25 :
@@ -2327,7 +2346,8 @@ void TokenLexicalActions(Token matchedToken)
     }
     else
     {
-      System.out.println("\u005ctDetectado subcontexto: " + image.toString());
+      tabular();
+      System.out.println("Detectado subcontexto: " + image.toString());
       SwitchTo(SUBCONTEXTO);
     }
          break;
@@ -2337,7 +2357,8 @@ void TokenLexicalActions(Token matchedToken)
     {
       listaSrv = true;
     }
-    System.out.print("\u005ctDetectado subcontexto: " + image.toString());
+    tabular();
+    System.out.print("Detectado subcontexto: " + image.toString());
     pilaEstados.push(curLexState);
          break;
       case 28 :
@@ -2347,6 +2368,7 @@ void TokenLexicalActions(Token matchedToken)
       case 29 :
         image.append(input_stream.GetSuffix(jjimageLen + (lengthOfMatch = jjmatchedPos + 1)));
     listaSrv = false;
+    depthLevel--;
     SwitchTo((int) pilaEstados.pop());
          break;
       case 30 :
