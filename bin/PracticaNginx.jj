@@ -23,7 +23,7 @@ public class practicaNginx
     //Entrada por fichero. Si no recibe nada salimos.
     if (args.length < 1)
     {
-      System.out.println("Pero p\u00e1sale un fichero, CRACK");
+      System.out.println("P\u00e1sale un fichero.");
       System.exit(0);
     }
     else
